@@ -54,6 +54,13 @@ import static org.jetbrains.kotlin.maven.Util.filterClassPath;
  */
 @Mojo(name = "compile", defaultPhase = LifecyclePhase.COMPILE, requiresDependencyResolution = ResolutionScope.COMPILE, threadSafe = true)
 public class K2JVMCompileMojo extends KotlinCompileMojoBase<K2JVMCompilerArguments> {
+
+    /**
+     * Flag to allow test compilation to be skipped.
+     */
+    @Parameter(property = "maven.main.skip", defaultValue = "false")
+    private boolean skip;
+
     /**
      * Project classpath.
      */
@@ -210,6 +217,11 @@ public class K2JVMCompileMojo extends KotlinCompileMojoBase<K2JVMCompilerArgumen
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (skip) {
+            getLog().info("Main compilation is skipped");
+            return;
+        }
+
         if (args != null && args.contains("-Xuse-javac")) {
             try {
                 URL toolsJar = getJdkToolsJarURL();
